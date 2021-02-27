@@ -1,0 +1,17 @@
+{
+	"manifest_version": 2,
+	"name": "Among US Live",
+	"short_name": "Among US",
+	"icons": [
+		{
+			"src": "/img/logo.png",
+			"type": "image/png",
+			"sizes": "512x512"
+		}
+	],
+	"start_url": "/game",
+	"display": "fullscreen",
+	"scope": "/",
+	"theme_color": "#3a4848",
+	"orientation": "landscape"
+}
