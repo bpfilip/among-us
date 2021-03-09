@@ -154,7 +154,8 @@ io.on("connection", socket => {
 			name,
 			socket,
 			host: isHost,
-			deviceId
+			deviceId,
+			emergencyButtonCount: 0
 		});
 		if (!relations[deviceId])
 			relations[deviceId] = [];
@@ -341,6 +342,9 @@ io.on("connection", socket => {
 			});
 
 			socket.on("emergencyButtonPushed", () => {
+				let playerIndex = players.findIndex(player => player.name === name);
+				if (players[playerIndex].emergencyButtonCount >= settings.emergencyButtonCount) return;
+				players[playerIndex].emergencyButtonCount++;
 				roundActive = false;
 				for (let i = 0; i < players.length; i++) {
 					players[i].reported = false;
