@@ -51,7 +51,7 @@
 				<p
 					class="minus"
 					v-on:click="
-						settings.discussionTime++;
+						settings.discussionTime += 15;
 						update();
 					"
 				>
@@ -61,7 +61,7 @@
 				<p
 					class="plus"
 					v-on:click="
-						settings.discussionTime--;
+						settings.discussionTime -= 15;
 						update();
 					"
 				>
@@ -73,7 +73,7 @@
 				<p
 					class="minus"
 					v-on:click="
-						settings.votingTime++;
+						settings.votingTime += 15;
 						update();
 					"
 				>
@@ -83,7 +83,7 @@
 				<p
 					class="plus"
 					v-on:click="
-						settings.votingTime--;
+						settings.votingTime -= 15;
 						update();
 					"
 				>
@@ -95,7 +95,7 @@
 				<p
 					class="minus"
 					v-on:click="
-						settings.killCooldown++;
+						settings.killCooldown += 15;
 						update();
 					"
 				>
@@ -105,7 +105,7 @@
 				<p
 					class="plus"
 					v-on:click="
-						settings.killCooldown--;
+						settings.killCooldown -= 15;
 						update();
 					"
 				>
