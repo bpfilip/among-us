@@ -12,9 +12,20 @@
 		<Vote v-show="showVote" :dead="isDead" :voteEnded="voteEnded" />
 		<div class="buttonPressed" v-if="showButtonPressed">
 			Emergency Meeting
-			<div v-if="isHost" v-on:click="$socket.emit('startDiscussion')" class="startDiscussion">Start discussion</div>
+			<div v-if="isHost" v-on:click="$socket.emit('startDiscussion')" class="startDiscussion">
+				Start discussion
+			</div>
 		</div>
 		<div class="killed" v-if="newlyDead"></div>
+		<div class="role" v-if="showRole">
+			<h1 v-if="imposter">You are the impostor</h1>
+			<h2 v-if="imposter">{{ imposters.join(", ") }}</h2>
+			<h1 v-if="!imposter">You are a crewmate</h1>
+		</div>
+		<div class="ended" v-if="end">
+			<h1 v-if="end.crematesWon">The crewmates won</h1>
+			<h1 v-if="end.impostersWon">The imposters won</h1>
+		</div>
 		<div class="top">
 			<div class="left">
 				<div class="progressBar">
@@ -31,7 +42,7 @@
 					/>
 				</div>
 				<div class="tasks">
-					<div class="task" v-for="task in tasks" :key="task.location">
+					<div class="task" v-for="task in tasks" :key="task.id">
 						{{ locationNames[task.location] }}: {{ taskNames[task.type] }}
 					</div>
 				</div>
@@ -56,7 +67,11 @@
 				v-on:click="/*$socket.emit('sabotage', 0)*/ showSabotageMap = true"
 			/>
 			<img v-show="!sabotageAble && imposter" src="img/button/sabotageDisabled.png" />
-			<img v-show="killAble && imposter" src="img/button/killButton.png" v-on:click="$socket.emit('kill')" />
+			<img
+				v-show="killAble && imposter"
+				src="img/button/killButton.png"
+				v-on:click="$socket.emit('kill')"
+			/>
 			<img v-show="!killAble && imposter" src="img/button/killButtonDisabled.png" />
 		</div>
 	</div>
@@ -86,12 +101,20 @@
 			id(id) {
 				sessionStorage.setItem("id", id);
 			},
-			imposter(isImposter) {
+			imposter({ isImposter, imposters }) {
 				this.imposter = isImposter;
-				console.log(isImposter);
+				this.imposters = imposters;
+				this.showRole = true;
+				setTimeout(()=>this.showRole = false, 2500);
+				console.log("is Imposter", isImposter);
+			},
+			deadBodyReported() {
+				this.showButtonPressed = true;
+				this.newlyDead = false;
 			},
 			emergencyMeeting() {
 				this.showButtonPressed = true;
+				this.newlyDead = false;
 			},
 			discussionStarted() {
 				this.showButtonPressed = false;
@@ -105,6 +128,13 @@
 			},
 			ejected() {
 				this.isDead = true;
+			},
+			deviceUpdate({ killAble, reportAble }) {
+				this.killAble = killAble;
+				this.reportAble = reportAble;
+			},
+			end(end) {
+				this.end = end;
 			}
 		},
 		computed: {
@@ -124,6 +154,8 @@
 				showButtonPressed: false,
 				taskType: null,
 				currentTask: null,
+				end: false,
+				showRole: false,
 				locationNames: [
 					"Salen",
 					"Salen",
@@ -199,11 +231,11 @@
 						this.currentTask = task ? task : { id: "", type: result, location: 0 };
 					}
 				} else if (result === "emergency") {
-						navigator.vibrate(20);
-						this.showScanner = false;
-						this.taskType = 3;
-						this.showTask = true;
-						this.currentTask = { id: "", type: 3, location: 0 };
+					navigator.vibrate(20);
+					this.showScanner = false;
+					this.taskType = 3;
+					this.showTask = true;
+					this.currentTask = { id: "", type: 3, location: 0 };
 				}
 			},
 			sabotage(location) {
@@ -313,6 +345,38 @@
 		background-repeat: no-repeat;
 		background-size: cover;
 	}
+	.ended {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		z-index: 1;
+		background-color: black;
+		color: white;
+		font-size: 40px;
+		text-align: center;
+		vertical-align: middle;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+	.role {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		z-index: 1;
+		background-color: black;
+		color: white;
+		font-size: 40px;
+		text-align: center;
+		vertical-align: middle;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
 	.buttonPressed {
 		position: absolute;
 		top: 0;
@@ -326,7 +390,7 @@
 		background-repeat: no-repeat;
 		background-size: cover;
 	}
-	.buttonPressed>div {
+	.buttonPressed > div {
 		position: absolute;
 		bottom: 20px;
 		border: 2px solid white;

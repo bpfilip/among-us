@@ -13,21 +13,23 @@ const { options } = require('./routes');
 
 const relations = [[0, 1, 2], [0, 1, 2], [0, 1, 2]];
 const tasks = [
-	{
-		type: 4,
-		location: 2,
-		id: "de6a2996-3843-4156-99b8-5e21e869aa64",
-		player: "filli1303",
-		complete: false
-	},
-	{
-		location: 0,
-		id: "3b758724-4100-44fc-8008-64372656a4fa",
-		type: 5,
-		player: "filli1303",
-		complete: false
-	}
+	// {
+	// 	type: 4,
+	// 	location: 2,
+	// 	id: "de6a2996-3843-4156-99b8-5e21e869aa64",
+	// 	player: "filli1303",
+	// 	complete: false
+	// },
+	// {
+	// 	location: 0,
+	// 	id: "3b758724-4100-44fc-8008-64372656a4fa",
+	// 	type: 5,
+	// 	player: "filli1303",
+	// 	complete: false
+	// }
 ];
+const DefaultTasks = require("./defaultTasks");
+
 const players = [];
 let gameStarted = false;
 let settings = {
@@ -39,7 +41,7 @@ let settings = {
 	killCooldown: 20,
 };
 let sabotage = false;
-let diedThisRound = [];
+let diedThisRoundIds = [];
 let roundActive = true;
 let discussionStarted = false;
 let discussionStartedAt = 0;
@@ -67,11 +69,38 @@ let votingStartedAt = 0;
 
 	wss.on('connection', function connection(ws) {
 		ws.on('message', function incoming(message) {
-			console.log('received: %s', message);
-			relations[message[0]] = message.split("").slice(1);
+			let nearby = message.split("").slice(1);
+			let invalid = false;
+			nearby = nearby.map(id => isNaN(id) ? invalid = true : parseInt(id));
+			if (invalid) return;
+			relations[message[0]] = nearby;
 
-			// let i = players.findIndex(player => player.deviceId === message[0]);
+			const i = players.findIndex(player => player.deviceId == message[0]);
+			if (!players[i]) return;
 
+			let killAble = false;
+			nearby.forEach(id => {
+				const i = players.findIndex(player => player.deviceId == id);
+				if (i < 0) return;
+				const p = players[i];
+				if (!p.isDead && !p.isImposter) {
+					killAble = true;
+				}
+			})
+			killAble = killAble && players[i].isImposter && !players[i].isDead && message.length > 1;
+
+			let reportAble = false;
+			nearby.forEach(id => {
+				const i = players.findIndex(player => player.deviceId == id);
+				if (i < 0) return;
+				const p = players[i];
+				if (diedThisRoundIds.includes(id) && !p.isImposter) {
+					reportAble = true;
+				}
+			})
+			reportAble = reportAble && !players[i].isDead && message.length > 1;
+
+			players[i].socket.emit("deviceUpdate", { killAble, reportAble });
 		});
 	});
 }
@@ -138,6 +167,7 @@ io.on("connection", socket => {
 			if (players.findIndex(player => player.name === name) !== 0) return // not host
 			io.emit("gameStarted");
 			gameStarted = true;
+			let imposters = []
 			for (let i = 0; i < settings.imposterCount; i++) {
 				let hasGiven = false;
 				while (!hasGiven) {
@@ -145,13 +175,23 @@ io.on("connection", socket => {
 					if (!players[p].isImposter) {
 						players[p].isImposter = true;
 						hasGiven = true;
+						imposters.push(players[p].name);
 					}
 				}
 			}
 			for (let i = 0; i < players.length; i++) {
-				console.log(players[i].isImposter);
-				players[i].socket.emit("imposter", players[i].isImposter ? true : false);
+				players[i].socket.emit("imposter", {isImposter: players[i].isImposter ? true : false, imposters});
 			}
+			players.forEach(p =>{
+				DefaultTasks.forEach(t => {
+					let task = {...t};
+					task.player = p.name;
+					task.id = uuidv4();
+					task.complete = false;
+					if (settings.roomsDisabled.includes(task.location)) return;
+					tasks.push(task)
+				})
+			})
 			console.log("Game Started");
 		});
 
@@ -172,16 +212,29 @@ io.on("connection", socket => {
 			if (players[playerIndex].isImposter) {
 				// When imposter kills a person
 				socket.on("kill", () => {
-					console.log("kill");
 					let playerIndex = players.findIndex(player => player.name === name);
-					let i = Math.floor(Math.random() * players.length);
-					while (playerIndex === i || players[i].isDead || players[i].isImposter || !relations[players[playerIndex].deviceId].includes(players[i].deviceId)) {
-						i = Math.floor(Math.random() * players.length);
-					}
+					// let i = Math.floor(Math.random() * players.length);
+					// while (playerIndex === i || players[i].isDead || players[i].isImposter || !relations[players[playerIndex].deviceId].includes(players[i].deviceId)) {
+					// 	i = Math.floor(Math.random() * players.length);
+					// }
+
+					if (relations[players[playerIndex].deviceId].length < 1) return;
+					const killAble = [];
+					relations[players[playerIndex].deviceId].forEach(id => {
+						const i = players.findIndex(player => player.deviceId == id);
+						if (!players[i].isDead && !players[i].isImposter) {
+							killAble.push(id);
+						}
+					});
+					if (killAble.length < 1) return;
+
+					const id = killAble[Math.floor(Math.random() * killAble.length)];
+					const i = players.findIndex(player => player.deviceId == id);
+
 					console.log("killed", i);
 					players[i].isDead = true;
 					players[i].socket.emit("killed");
-					diedThisRound.push(players[i].deviceId);
+					diedThisRoundIds.push(players[i].deviceId);
 					const alive = players.reduce((count, p) => count += !p.isDead && !p.isImposter, 0);
 					if (alive <= settings.imposterCount) {
 						console.log("Game ended", "impostors won");
@@ -229,7 +282,7 @@ io.on("connection", socket => {
 							if (!players[i].isDead)
 								if (!isNaN(players[i].voted) && players[i].voted !== null) {
 									votes[players[i].voted].count++;
-								} else {
+								} else if (players[i].voted === null) {
 									skips++;
 								}
 						}
@@ -250,7 +303,7 @@ io.on("connection", socket => {
 						}
 
 						sabotage = false;
-						diedThisRound = [];
+						diedThisRoundIds = [];
 						roundActive = true;
 						discussionStarted = false;
 						discussionStartedAt = 0;
@@ -272,13 +325,13 @@ io.on("connection", socket => {
 			socket.on("report", () => {
 				let playerIndex = players.findIndex(player => player.name === name);
 				let nearby = false;
-				diedThisRound.forEach(id => {
+				diedThisRoundIds.forEach(id => {
 					if (relations[players[playerIndex].deviceId].includes(id)) {
 						nearby = true;
 					}
 				})
-				console.log(nearby);
 				if (!nearby) return;
+				console.log(`"${players[playerIndex].name}" reported`);
 				roundActive = false;
 				for (let i = 0; i < players.length; i++) {
 					players[i].reported = false;
