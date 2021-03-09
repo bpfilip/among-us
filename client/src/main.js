@@ -15,7 +15,7 @@ const store = new Vuex.Store({});
 Vue.use(
   new VueSocketIO({
     debug: true,
-    connection: `${window.location.protocol}//${window.location.hostname}:8081`,
+    connection: process.env.NODE_ENV === 'production' ? "https://amongus.bpfilip.dk/api/" : `${window.location.protocol}//${window.location.hostname}:8081`,
     vuex: {
       store,
       actionPrefix: "SOCKET_",
