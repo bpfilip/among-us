@@ -50,7 +50,6 @@
 			<div class="sideButtons">
 				<img src="img/button/settingsButton.png" />
 				<img src="img/button/mapButtonDark.png" v-on:click="showMap = true" />
-				<img src="img/button/chatButton.png" />
 			</div>
 		</div>
 		<div class="bottomButtons">
