@@ -39,7 +39,6 @@
 		display: flex;
 		justify-content: center;
 		align-items: flex-start;
-		height: intrinsic;
 	}
 	.logo img {
 		margin-top: 20px;
