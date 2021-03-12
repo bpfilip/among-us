@@ -38,10 +38,12 @@
 	.logo {
 		display: flex;
 		justify-content: center;
+		align-items: flex-start;
 	}
 	.logo img {
 		margin-top: 20px;
 		width: 80vw;
+
 	}
 	.buttons {
 		display: flex;
