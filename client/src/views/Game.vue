@@ -199,7 +199,7 @@
 				isDead: false,
 				showVote: false,
 				newlyDead: false,
-				showSettings: true
+				showSettings: false
 			};
 		},
 		components: {

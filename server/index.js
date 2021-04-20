@@ -147,6 +147,7 @@ io.on("connection", socket => {
 				players[0].host = true;
 				players[0].socket.emit("isHost", true);
 			} else {
+				console.log("All players left restarting game");
 				process.exit();
 			}
 		})
