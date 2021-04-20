@@ -75,6 +75,11 @@
 				p5.image(this.emergencyButtonImage, 725>>1, 434>>1);
 			},
 			draw(p5) {
+				p5.clear();
+				this.tasks.forEach(task=> {
+					p5.image(this.taskImage, this.taskPositions[task.location].x>>1, this.taskPositions[task.location].y>>1);
+				});
+				p5.image(this.emergencyButtonImage, 725>>1, 434>>1);
 			}
 		}
 	};
