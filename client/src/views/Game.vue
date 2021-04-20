@@ -2,7 +2,7 @@
 	<div class="Main">
 		<QRScanner v-if="showScanner" :onDecode="onDecode" :closeScanner="closeScanner" />
 		<Map v-show="showMap" :closeMap="closeMap" :tasks="tasks" />
-		<SabotageMap v-show="showSabotageMap" :closeMap="closeMap" :sabotage="sabotage" />
+		<SabotageMap v-if="showSabotageMap" :closeMap="closeMap" :sabotage="sabotage" />
 		<Task
 			v-if="showTask"
 			:closeTask="closeTask"
