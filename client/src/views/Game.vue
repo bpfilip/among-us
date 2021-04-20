@@ -53,7 +53,7 @@
 			</div>
 		</div>
 		<div class="bottomButtons">
-			<img src="img/button/scanButton.svg" v-on:click="showScanner = true" />
+			<img src="img/button/scan.png" v-on:click="showScanner = true" />
 			<img
 				v-show="reportAble"
 				src="img/button/reportButton.png"
