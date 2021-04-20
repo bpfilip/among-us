@@ -136,6 +136,9 @@
 			},
 			end(end) {
 				this.end = end;
+			},
+			restarting() {
+				location.reload();
 			}
 		},
 		computed: {

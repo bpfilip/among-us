@@ -184,12 +184,12 @@ io.on("connection", socket => {
 				}
 			}
 			for (let i = 0; i < players.length; i++) {
-				players[i].socket.emit("imposter", {isImposter: players[i].isImposter ? true : false, imposters});
+				players[i].socket.emit("imposter", { isImposter: players[i].isImposter ? true : false, imposters });
 			}
-			players.forEach(p =>{
+			players.forEach(p => {
 				if (p.isImposter) return;
 				DefaultTasks.forEach(t => {
-					let task = {...t};
+					let task = { ...t };
 					task.player = p.name;
 					task.id = uuidv4();
 					task.complete = false;
@@ -211,6 +211,15 @@ io.on("connection", socket => {
 			if (!gameStarted) return; // Check if client is trying to load before game is started
 			socket.emit("tasks", tasks.filter(task => !task.complete && task.player === name && !task.locked));
 			socket.emit("progress", tasks.reduce((acc, cur) => acc += cur.complete ? 1 / tasks.length : 0, 0));
+
+			socket.on("restart", () => {
+				let playerIndex = players.findIndex(player => player.name === name);
+				if (!players[playerIndex].host) return; // Only hosts can restart the game
+
+				console.log("The host restarted the game");
+				io.emit("restarting");
+				process.exit();
+			})
 
 			// If player is imposter
 			let playerIndex = players.findIndex(player => player.name === name);

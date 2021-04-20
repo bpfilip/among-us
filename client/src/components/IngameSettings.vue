@@ -3,6 +3,7 @@
 		<div class="container">
 			<div class="container2">
 				<div class="button leave" v-on:click="leave()">Leave Game</div>
+				<div v-if="this.$parent.isHost" class="button restart" v-on:click="restart()">Restart Game</div>
 				<div class="button return" v-on:click="back()">Return To Game</div>
 			</div>
 		</div>
@@ -17,6 +18,9 @@
 			},
 			back() {
 				this.$parent.showSettings = false;
+			},
+			restart() {
+				this.$socket.emit("restart");
 			}
 		}
 	};
