@@ -186,6 +186,7 @@ io.on("connection", socket => {
 				players[i].socket.emit("imposter", {isImposter: players[i].isImposter ? true : false, imposters});
 			}
 			players.forEach(p =>{
+				if (p.isImposter) return;
 				DefaultTasks.forEach(t => {
 					let task = {...t};
 					task.player = p.name;

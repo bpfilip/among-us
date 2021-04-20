@@ -138,6 +138,7 @@
 		},
 		computed: {
 			sabotageAble() {
+				if (this.tasks.length < 1) return true;
 				for (let i = 0; i < this.tasks.length; i++) {
 					if (this.tasks[i].type !== 13) return true;
 				}
@@ -164,11 +165,11 @@
 					"Lok. 3",
 					"Lok. 1",
 					"Esport",
-					"Dagli",
-					"Dagli",
-					"spisesal",
+					"Daglig",
+					"Daglig",
+					"Spisesal",
 					"Lounge",
-					"spisesal"
+					"Spisesal"
 				],
 				taskNames: [
 					"Electricity",
