@@ -146,6 +146,8 @@ io.on("connection", socket => {
 			if (players.length > 0) {
 				players[0].host = true;
 				players[0].socket.emit("isHost", true);
+			} else {
+				process.exit();
 			}
 		})
 
