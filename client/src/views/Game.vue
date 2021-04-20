@@ -10,6 +10,7 @@
 			:taskComplete="taskComplete"
 		/>
 		<Vote v-show="showVote" :dead="isDead" :voteEnded="voteEnded" />
+		<IngameSettings v-show="showSettings" />
 		<div class="buttonPressed" v-if="showButtonPressed">
 			Emergency Meeting
 			<div v-if="isHost" v-on:click="$socket.emit('startDiscussion')" class="startDiscussion">
@@ -48,7 +49,7 @@
 				</div>
 			</div>
 			<div class="sideButtons">
-				<img src="img/button/settingsButton.png" />
+				<img src="img/button/settingsButton.png" v-on:click="showSettings = true"/>
 				<img src="img/button/mapButtonDark.png" v-on:click="showMap = true" />
 			</div>
 		</div>
@@ -83,6 +84,7 @@
 	import Task from "@/components/Task";
 	import VueCompareImage from "@/components/VueCompareImage";
 	import Vote from "@/components/Vote";
+	import IngameSettings from "@/components/IngameSettings";
 	export default {
 		name: "Game",
 		props: {
@@ -196,7 +198,8 @@
 				discussionStarted: false,
 				isDead: false,
 				showVote: false,
-				newlyDead: false
+				newlyDead: false,
+				showSettings: true
 			};
 		},
 		components: {
@@ -205,7 +208,8 @@
 			Task,
 			VueCompareImage,
 			Vote,
-			SabotageMap
+			SabotageMap,
+			IngameSettings
 		},
 		methods: {
 			closeScanner() {
