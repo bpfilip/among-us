@@ -104,7 +104,7 @@
 				this.imposter = isImposter;
 				this.imposters = imposters;
 				this.showRole = true;
-				setTimeout(()=>this.showRole = false, 2500);
+				setTimeout(() => (this.showRole = false), 2500);
 				console.log("is Imposter", isImposter);
 			},
 			deadBodyReported() {
@@ -224,14 +224,14 @@
 					const task = this.tasks.find(task => task.location === result);
 					if (task !== undefined) {
 						// Valid QR Code
-						navigator.vibrate(20);
+						if (navigator.vibrate) navigator.vibrate(20);
 						this.showScanner = false;
 						this.taskType = task.type;
 						this.showTask = true;
 						this.currentTask = task ? task : { id: "", type: result, location: 0 };
 					}
 				} else if (result === "emergency") {
-					navigator.vibrate(20);
+					if (navigator.vibrate) navigator.vibrate(20);
 					this.showScanner = false;
 					this.taskType = 3;
 					this.showTask = true;

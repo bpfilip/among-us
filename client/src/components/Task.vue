@@ -1,11 +1,6 @@
 <template>
 	<div class="Task">
-		<img
-			class="close"
-			src="img/closeButton.png"
-			alt=""
-			v-on:click="closeTask"
-		/>
+		<img class="close" src="img/closeButton.png" alt="" v-on:click="closeTask" />
 		<Electricity v-if="type === 0" :onDone="onDone" />
 		<DivertPower1 v-if="type === 1" :onDone="onDone" />
 		<DivertPower2 v-if="type === 2" :onDone="onDone" />
@@ -40,8 +35,7 @@
 	export default {
 		name: "Task",
 		data() {
-			return {
-			};
+			return {};
 		},
 		computed: {},
 		components: {
@@ -72,8 +66,8 @@
 		},
 		methods: {
 			onDone() {
-				navigator.vibrate(250);
-				this.taskComplete(this.type)
+				if (navigator.vibrate) navigator.vibrate(250);
+				this.taskComplete(this.type);
 			}
 		}
 	};
