@@ -12,7 +12,8 @@
 		<Vote v-show="showVote" :dead="isDead" :voteEnded="voteEnded" />
 		<IngameSettings v-show="showSettings" />
 		<div class="buttonPressed" v-if="showButtonPressed">
-			Emergency Meeting
+			<img v-if="showBody" src="img/dead body reported.png" />
+			<img v-if="showMeeting" src="img/emergency meeting.png" />
 			<div v-if="isHost" v-on:click="$socket.emit('startDiscussion')" class="startDiscussion">
 				Start discussion
 			</div>
@@ -110,10 +111,14 @@
 				console.log("is Imposter", isImposter);
 			},
 			deadBodyReported() {
+				this.showBody = true;
+				this.showMeeting = false;
 				this.showButtonPressed = true;
 				this.newlyDead = false;
 			},
 			emergencyMeeting() {
+				this.showMeeting = true;
+				this.showBody = false;
 				this.showButtonPressed = true;
 				this.newlyDead = false;
 			},
@@ -202,7 +207,9 @@
 				isDead: false,
 				showVote: false,
 				newlyDead: false,
-				showSettings: false
+				showSettings: false,
+				showMeeting: false,
+				showBody: false
 			};
 		},
 		components: {
@@ -396,6 +403,7 @@
 		background-position: center center;
 		background-repeat: no-repeat;
 		background-size: cover;
+		color: white;
 	}
 	.buttonPressed > div {
 		position: absolute;
@@ -407,5 +415,9 @@
 		background-color: #000;
 		right: 20px;
 		color: white;
+	}
+	
+	.buttonPressed > img {
+		width: 100vw;
 	}
 </style>
