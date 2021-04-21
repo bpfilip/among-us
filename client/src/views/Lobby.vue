@@ -30,6 +30,7 @@
 				</p>
 			</div>
 			<img src="img/button/join.png" class="join" v-on:click="nameSubmit" />
+			<div class="back" v-on:click="$router.push('/')">Back</div>
 			<div class="version">v{{ version }}</div>
 		</div>
 		<div class="Lobby" v-if="!gameStarted">
@@ -220,5 +221,17 @@
 		margin: 30px;
 		font-size: 20px;
 		background: black;
+	}
+	.back {
+		position: absolute;
+		left: -20px;
+		color: white;
+		border: 2px white solid;
+		border-radius: 4px;
+		padding: 4px;
+		margin: 30px;
+		font-size: 20px;
+		background: black;
+		margin-top: 95vh;
 	}
 </style>
