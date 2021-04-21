@@ -50,7 +50,7 @@
 				</div>
 			</div>
 			<div class="sideButtons">
-				<img src="img/button/settingsButton.png" v-on:click="showSettings = true"/>
+				<img src="img/button/settingsButton.png" v-on:click="showSettings = true" />
 				<img src="img/button/mapButtonDark.png" v-on:click="showMap = true" />
 			</div>
 		</div>
@@ -269,6 +269,11 @@
 			voteEnded() {
 				this.discussionStarted = false;
 				this.showVote = false;
+				if (this.end) {
+					setTimeout(() => {
+						this.$router.push("/");
+					}, 5000);
+				}
 			}
 		}
 	};
@@ -416,7 +421,7 @@
 		right: 20px;
 		color: white;
 	}
-	
+
 	.buttonPressed > img {
 		width: 100vw;
 	}

@@ -123,6 +123,11 @@ io.on("connection", socket => {
 			return;
 		}
 
+		if (players.findIndex(player => player.deviceId === deviceId) > -1) {
+			socket.emit("joinFail", "Device id already used");
+			return;
+		}
+
 		if (gameStarted) {
 			socket.emit("joinFail", "Game is already started");
 			return;
@@ -148,7 +153,7 @@ io.on("connection", socket => {
 				players[0].socket.emit("isHost", true);
 			} else {
 				console.log("All players left restarting game");
-				process.exit();
+				setTimeout(() => { process.exit() }, 500);;
 			}
 		})
 
@@ -218,7 +223,7 @@ io.on("connection", socket => {
 
 				console.log("The host restarted the game");
 				io.emit("restarting");
-				process.exit();
+				setTimeout(() => { process.exit() }, 500);;
 			})
 
 			// If player is imposter
@@ -254,6 +259,7 @@ io.on("connection", socket => {
 					if (alive <= settings.imposterCount) {
 						console.log("Game ended", "impostors won");
 						io.emit("end", { impostersWon: true, crematesWon: false });
+						setTimeout(() => { process.exit() }, 500);;
 					}
 				});
 
@@ -315,6 +321,21 @@ io.on("connection", socket => {
 							io.emit("voteResult", { state: players[ejectedPlayer].isImposter ? 0 : 1, name: players[ejectedPlayer].name });
 							players[ejectedPlayer].socket.emit("ejected");
 							players[ejectedPlayer].isDead = true;
+
+							const alive = players.reduce((count, p) => count += !p.isDead && !p.isImposter, 0);
+							if (alive <= settings.imposterCount) {
+								console.log("Game ended", "impostors won");
+								io.emit("end", { impostersWon: true, crematesWon: false });
+								setTimeout(() => { process.exit() }, 500);;
+							}
+
+							const impostersAlive = players.reduce((count, p) => count += (!p.isDead && p.isImposter) ? 1 : 0, 0);
+							console.log(impostersAlive);
+							if (impostersAlive < 1) {
+								console.log("Game ended", "crewmates won");
+								io.emit("end", { impostersWon: false, crematesWon: true });
+								setTimeout(() => { process.exit() }, 500);
+							}
 						}
 
 						sabotage = false;
@@ -391,7 +412,9 @@ io.on("connection", socket => {
 				socket.emit("tasks", tasks.filter(task => !task.complete && task.player === name && !task.locked));
 				io.emit("progress", tasks.reduce((acc, cur) => acc += cur.complete ? 1 / tasks.length : 0, 0));
 				if (tasks.reduce((acc, cur) => acc += cur.complete ? 1 / tasks.length : 0, 0) == 1) {
+					console.log("Game ended the crew won");
 					io.emit("end", { impostersWon: false, crematesWon: true });
+					setTimeout(() => { process.exit() }, 500);;
 				}
 			});
 		});
