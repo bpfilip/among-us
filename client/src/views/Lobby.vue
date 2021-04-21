@@ -37,6 +37,7 @@
 			<p class="players">{{ playersInLobby.count }}/{{ playersInLobby.slots }}</p>
 			<img v-if="isHost" v-on:click="showSettings" src="img/button/settingsButton.png" />
 			<Settings v-if="showSettingsMenu" :updateSettings="updateSettings" />
+			<div class="leave" v-on:click="leave()">Leave Lobby</div>
 		</div>
 		<Game v-if="joined" v-show="gameStarted" v:name="username" :isHost="isHost" />
 	</div>
@@ -130,6 +131,9 @@
 					this.deviceId = 9;
 				}
 				localStorage.setItem("deviceId", this.deviceId);
+			},
+			leave() {
+				location.href = "/";
 			}
 		}
 	};
@@ -204,5 +208,17 @@
 		-webkit-text-stroke: 0.5px black;
 		font-family: Arial, Helvetica, sans-serif;
 		font-size: 2vw;
+	}
+	.leave {
+		position: absolute;
+		bottom: 10px;
+		left: -20px;
+		color: white;
+		border: 2px white solid;
+		border-radius: 4px;
+		padding: 4px;
+		margin: 30px;
+		font-size: 20px;
+		background: black;
 	}
 </style>
