@@ -33,7 +33,7 @@
 			<div class="back" v-on:click="$router.push('/')">Back</div>
 			<div class="version">v{{ version }}</div>
 		</div>
-		<div class="Lobby" v-if="!gameStarted">
+		<div class="Lobby" v-if="!gameStarted&&!showNameInput">
 			<img v-if="isHost" v-on:click="startGame" src="img/startButton.png" />
 			<p class="players">{{ playersInLobby.count }}/{{ playersInLobby.slots }}</p>
 			<img v-if="isHost" v-on:click="showSettings" src="img/button/settingsButton.png" />
