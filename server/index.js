@@ -260,7 +260,7 @@ io.on("connection", socket => {
 					const alive = players.reduce((count, p) => count += !p.isDead && !p.isImposter, 0);
 					if (alive <= settings.imposterCount) {
 						console.log("Game ended", "impostors won");
-						io.emit("end", { impostersWon: true, crematesWon: false });
+						io.emit("end", { impostersWon: true, crewmatesWon: false });
 						setTimeout(() => { process.exit() }, 500);;
 					}
 				});
@@ -327,7 +327,7 @@ io.on("connection", socket => {
 							const alive = players.reduce((count, p) => count += !p.isDead && !p.isImposter, 0);
 							if (alive <= settings.imposterCount) {
 								console.log("Game ended", "impostors won");
-								io.emit("end", { impostersWon: true, crematesWon: false });
+								io.emit("end", { impostersWon: true, crewmatesWon: false });
 								setTimeout(() => { process.exit() }, 500);;
 							}
 
@@ -335,7 +335,7 @@ io.on("connection", socket => {
 							console.log(impostersAlive);
 							if (impostersAlive < 1) {
 								console.log("Game ended", "crewmates won");
-								io.emit("end", { impostersWon: false, crematesWon: true });
+								io.emit("end", { impostersWon: false, crewmatesWon: true });
 								setTimeout(() => { process.exit() }, 500);
 							}
 						}
@@ -410,6 +410,7 @@ io.on("connection", socket => {
 				}
 				let i = -1;
 				tasks.forEach((task, index) => { if (task.id === id) i = index })
+				console.log(i, id, tasks);
 				tasks[i].complete = true;
 				if (tasks[i].type === 1 || tasks[i].type === 7) { // if is "Divert Power (0/2)" or "Fuel (0/2)"
 					tasks[i].type++;
@@ -426,7 +427,7 @@ io.on("connection", socket => {
 				io.emit("progress", tasks.reduce((acc, cur) => acc += cur.complete ? 1 / tasks.length : 0, 0));
 				if (tasks.reduce((acc, cur) => acc += cur.complete ? 1 / tasks.length : 0, 0) == 1) {
 					console.log("Game ended the crew won");
-					io.emit("end", { impostersWon: false, crematesWon: true });
+					io.emit("end", { impostersWon: false, crewmatesWon: true });
 					setTimeout(() => { process.exit() }, 500);;
 				}
 			});

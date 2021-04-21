@@ -25,7 +25,7 @@
 			<h1 v-if="!imposter">You are a crewmate</h1>
 		</div>
 		<div class="ended" v-if="end">
-			<h1 v-if="end.crematesWon">The crewmates won</h1>
+			<h1 v-if="end.crewmatesWon">The crewmates won</h1>
 			<h1 v-if="end.impostersWon">The imposters won</h1>
 		</div>
 		<div class="top">
@@ -55,25 +55,31 @@
 			</div>
 		</div>
 		<div class="bottomButtons">
-			<img src="img/button/scan.png" v-on:click="showScanner = true" />
+			<img v-show="!isDead" src="img/button/scan.png" v-on:click="showScanner = true" />
 			<img
-				v-show="reportAble"
+				v-show="reportAble && !isDead"
 				src="img/button/reportButton.png"
 				v-on:click="$socket.emit('report')"
 			/>
-			<img v-show="!reportAble" src="img/button/reportButtonDisabled.png" />
+			<img v-show="!reportAble && !isDead" src="img/button/reportButtonDisabled.png" />
 			<img
-				v-show="sabotageAble && imposter"
+				v-show="sabotageAble && imposter && !isDead"
 				src="img/button/sabotage.png"
 				v-on:click="/*$socket.emit('sabotage', 0)*/ showSabotageMap = true"
 			/>
-			<img v-show="!sabotageAble && imposter" src="img/button/sabotageDisabled.png" />
+			<img
+				v-show="!sabotageAble && imposter && !isDead"
+				src="img/button/sabotageDisabled.png"
+			/>
 			<img
 				v-show="killAble && imposter"
 				src="img/button/killButton.png"
 				v-on:click="$socket.emit('kill')"
 			/>
-			<img v-show="!killAble && imposter" src="img/button/killButtonDisabled.png" />
+			<img
+				v-show="!killAble && imposter && !isDead"
+				src="img/button/killButtonDisabled.png"
+			/>
 		</div>
 	</div>
 </template>
@@ -209,7 +215,8 @@
 				newlyDead: false,
 				showSettings: false,
 				showMeeting: false,
-				showBody: false
+				showBody: false,
+				isDoneWithTasks: false
 			};
 		},
 		components: {
@@ -265,6 +272,19 @@
 					console.log("Emergency Button Pressed");
 					this.$socket.emit("emergencyButtonPushed");
 				}
+
+				if (this.isDead) {
+					setTimeout(() => {
+						const task = this.tasks[0];
+						if (!task) {
+							this.isDoneWithTasks = true;
+						}
+
+						this.taskType = task.type;
+						this.showTask = true;
+						this.currentTask = task;
+					}, 500);
+				}
 			},
 			voteEnded() {
 				this.discussionStarted = false;
@@ -273,6 +293,14 @@
 					setTimeout(() => {
 						this.$router.push("/");
 					}, 5000);
+				}
+
+				if (this.isDead) {
+					const task = this.tasks[0];
+
+					this.taskType = task.type;
+					this.showTask = true;
+					this.currentTask = task;
 				}
 			}
 		}
