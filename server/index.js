@@ -236,6 +236,7 @@ io.on("connection", socket => {
 					const killAble = [];
 					relations[players[playerIndex].deviceId].forEach(id => {
 						const i = players.findIndex(player => player.deviceId == id);
+						if (i < 0) return;
 						if (!players[i].isDead && !players[i].isImposter) {
 							killAble.push(id);
 						}
