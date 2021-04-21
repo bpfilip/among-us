@@ -47,6 +47,8 @@ let discussionStarted = false;
 let discussionStartedAt = 0;
 let votingStarted = false;
 let votingStartedAt = 0;
+let CountVotes;
+let CountVotesId;
 
 // Device
 {
@@ -293,7 +295,7 @@ io.on("connection", socket => {
 					votingStarted = true;
 					io.emit("votingStarted", { endingAt: votingStartedAt + settings.votingTime * 1000, players: playersToSend });
 
-					setTimeout(() => {
+					CountVotes = () => {
 						let votes = [];
 						let skips = 0;
 						for (let i = 0; i < 10; i++) {
@@ -345,7 +347,10 @@ io.on("connection", socket => {
 						discussionStartedAt = 0;
 						votingStarted = false;
 						votingStartedAt = 0;
-					}, settings.votingTime * 1000)
+					}
+
+					CountVotesId = setTimeout(CountVotes, settings.votingTime * 1000);
+
 				}, settings.discussionTime * 1000)
 			});
 
@@ -356,6 +361,14 @@ io.on("connection", socket => {
 				let playersToSend = []
 				players.forEach(p => playersToSend.push({ name: p.name, deviceId: p.deviceId, dead: p.isDead, reported: p.reported, voted: p.voted }));
 				io.emit("voteUpdate", { endingAt: votingStartedAt + settings.votingTime * 1000, players: playersToSend });
+
+				let playersVoted = players.reduce((acc, p) => acc += (p.voted !== undefined && !p.isDead) ? 1 : 0, 0);
+				let playersAlive = players.reduce((acc, p) => acc += (!p.isDead) ? 1 : 0, 0);
+
+				if (playersVoted >= playersAlive) {
+					clearTimeout(CountVotesId);
+					setTimeout(CountVotes, 1000);
+				}
 			});
 
 			socket.on("report", () => {
