@@ -410,7 +410,6 @@ io.on("connection", socket => {
 				}
 				let i = -1;
 				tasks.forEach((task, index) => { if (task.id === id) i = index })
-				console.log(i, id, tasks);
 				tasks[i].complete = true;
 				if (tasks[i].type === 1 || tasks[i].type === 7) { // if is "Divert Power (0/2)" or "Fuel (0/2)"
 					tasks[i].type++;
